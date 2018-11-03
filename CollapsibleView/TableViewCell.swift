@@ -21,10 +21,12 @@ public class TableViewCell: UITableViewCell, TableCellProtocol {
 
     private var stackView: UIStackView
     private var rightItems:UIStackView
-    private var expandButton: UIButton
+    private var toggleButton: UIButton
     private var btnOne: UIButton
     private var btnTwo: UIButton
     private var btnThree:UIButton
+
+    private var expandableBtns = [UIButton]()
 
     public private(set) var txtlabel:UILabel
 
@@ -47,7 +49,7 @@ public class TableViewCell: UITableViewCell, TableCellProtocol {
         stackView = UIStackView(forConstraints: false)
         txtlabel = UILabel(forConstraints: false)
         rightItems = UIStackView(forConstraints: false)
-        expandButton = UIButton(forConstraints: false)
+        toggleButton = UIButton(forConstraints: false)
         btnOne = UIButton(forConstraints: false)
         btnTwo = UIButton(forConstraints: false)
         btnThree = UIButton(forConstraints: false)
@@ -98,41 +100,40 @@ public class TableViewCell: UITableViewCell, TableCellProtocol {
     }
 
     private func switching(toExpand: Bool) {
-        btnOne.isHidden = !toExpand
-        btnTwo.isHidden = !toExpand
-        btnThree.isHidden = !toExpand
-
         let priority: UILayoutPriority = toExpand ? .required : .defaultLow
-
-        btnOne.setContentHuggingPriority(priority, for: .horizontal)
-        btnOne.setContentCompressionResistancePriority(priority, for: .horizontal)
-        btnTwo.setContentHuggingPriority(priority, for: .horizontal)
-        btnTwo.setContentCompressionResistancePriority(priority, for: .horizontal)
-        btnThree.setContentHuggingPriority(priority, for: .horizontal)
-        btnThree.setContentCompressionResistancePriority(priority, for: .horizontal)
+        for btn in expandableBtns {
+            btn.isHidden = !toExpand
+            btn.setContentHuggingPriority(
+                priority,
+                for: .horizontal
+            )
+            btn.setContentCompressionResistancePriority(
+                priority,
+                for: .horizontal
+            )
+        }
     }
 
 
     private func setupEllipses() {
-        expandButton.setTitle("Respond", for: .normal)
-        expandButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
-        expandButton.setTitleColor(UIColor.random, for: .normal)
-        expandButton.setContentHuggingPriority(.required, for: .horizontal)
-        expandButton.setContentCompressionResistancePriority(.required, for: .horizontal)
-        rightItems.addArrangedSubview(expandButton)
+        toggleButton.setTitle("Respond", for: .normal)
+        toggleButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
+        toggleButton.setTitleColor(UIColor.random, for: .normal)
+        toggleButton.setContentHuggingPriority(.required, for: .horizontal)
+        toggleButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        rightItems.addArrangedSubview(toggleButton)
     }
 
     private func setupExpansion() {
+        expandableBtns.append(contentsOf: [btnOne, btnTwo, btnThree])
         let btnStyle = ButtonStyle()
         btnOne.setTitle("Accept", for: .normal)
         btnTwo.setTitle("Maybe", for: .normal)
         btnThree.setTitle("Decline", for: .normal)
-        btnOne.apply(style: btnStyle)
-        btnTwo.apply(style: btnStyle)
-        btnThree.apply(style: btnStyle)
-        rightItems.addArrangedSubview(btnOne)
-        rightItems.addArrangedSubview(btnTwo)
-        rightItems.addArrangedSubview(btnThree)
+        expandableBtns.map { btn in
+            btn.apply(style: btnStyle)
+            rightItems.addArrangedSubview(btn)
+        }
     }
 
     private func setupConstraints() {
